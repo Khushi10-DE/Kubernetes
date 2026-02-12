@@ -1,37 +1,49 @@
-🚀 Docker & Kubernetes Beginner Notes
-🐳 What is Docker?
+# 🚀 Docker & Kubernetes Beginner Guide
+
+---
+
+## 🐳 What is Docker?
 
 Docker is a platform that:
 
-Packages application + dependencies
+- Packages applications with their dependencies  
+- Runs them in isolated environments called **containers**  
+- A container includes:
+  - Application
+  - Dependencies
+  - System tools  
 
-Runs them in isolated environments called containers
+Kubernetes uses a **container runtime** (like Docker or containerd) to run containers.
 
-A container is a lightweight package of:
+---
 
-Application
+# 🛠 Docker Installation (Ubuntu)
 
-Dependencies
+## Step 1 — Update System
 
-System tools
-
-Kubernetes uses a container runtime (like Docker or containerd) to run containers.
-
-🛠 Install Docker (Ubuntu)
-Step 1 — Update system
+```bash
 sudo apt update
 sudo apt upgrade -y
+```
 
-Step 2 — Install required packages
+## Step 2 — Install Required Packages
+
+```bash
 sudo apt install -y ca-certificates curl gnupg lsb-release
+```
 
-Step 3 — Add Docker Official GPG Key
+## Step 3 — Add Docker Official GPG Key
+
+```bash
 sudo install -m 0755 -d /etc/apt/keyrings
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
 
-Step 4 — Add Docker Repository
+## Step 4 — Add Docker Repository
+
+```bash
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
 echo \
@@ -40,122 +52,198 @@ signed-by=/etc/apt/keyrings/docker.gpg] \
 https://download.docker.com/linux/ubuntu \
 $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \
 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
 
-Step 5 — Install Docker
+## Step 5 — Install Docker
+
+```bash
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
 
-Step 6 — Start Docker
+## Step 6 — Start Docker
+
+```bash
 sudo systemctl start docker
 sudo systemctl enable docker
 docker --version
+```
 
-☸️ Kubernetes Tools
-Tool	What It Does
-kubectl	Command tool to talk to Kubernetes
-kubeadm	Creates production cluster
-minikube	Local single-node cluster for learning
-📦 Install kubectl
+---
+
+# ☸️ Kubernetes Tools
+
+| Tool      | Purpose |
+|-----------|----------|
+| kubectl   | Command-line tool to control Kubernetes |
+| kubeadm   | Tool to create production clusters |
+| minikube  | Local single-node cluster for learning |
+
+---
+
+# 📦 Install kubectl
+
+```bash
 curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
 
 chmod +x kubectl
 
 sudo mv kubectl /usr/local/bin/
-
+```
 
 Check version:
 
+```bash
 kubectl version --client
+```
 
-📦 Install Minikube
+---
+
+# 📦 Install Minikube
+
+```bash
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
+```
 
+Start the cluster:
 
-Start Kubernetes Cluster:
-
+```bash
 minikube start --driver=docker
+```
 
+Why `--driver=docker`?
 
-Why --driver=docker?
-
-Minikube will create the Kubernetes node using Docker containers.
+Minikube creates the Kubernetes node using Docker containers.
 
 Check cluster:
 
+```bash
 kubectl get nodes
+```
 
-🧠 Core Concepts
-Node
+---
 
-Machine where Pods run (Minikube is one node)
+# 🧠 Core Kubernetes Concepts
 
-Pod
+## 🔹 Node
+A machine where Pods run.  
+(Minikube creates one node for learning.)
 
-Smallest unit in Kubernetes
-Pod runs one or more containers
+## 🔹 Pod
+- Smallest unit in Kubernetes  
+- Runs one or more containers  
 
-Deployment
+## 🔹 Deployment
+- Manages Pods  
+- Maintains desired number of replicas  
+- Provides self-healing  
+- Enables scaling  
 
-Manages Pods
+## 🔹 Service
+Exposes Pods to the network and provides load balancing.
 
-Ensures desired number of replicas are always running
+---
 
-Provides self-healing and scaling
+# 🛠 Essential Kubernetes Commands
 
-Service
+## 🔹 Check Cluster
 
-Exposes Pods to the network
-
-🛠 Commands You Must Know
-Check Cluster
+```bash
 kubectl cluster-info
 kubectl get nodes
+```
 
-Create Application Deployment
+## 🔹 Create Application Deployment
+
+```bash
 kubectl create deployment khushbunginx --image=nginx
+```
 
-See Running Pods
+## 🔹 View Running Pods
+
+```bash
 kubectl get pods
+```
 
-See System Pods
+## 🔹 View System Pods
+
+```bash
 kubectl get pods -n kube-system
+```
 
-Scale Application
+## 🔹 Scale Application
+
+```bash
 kubectl scale deployment khushbunginx --replicas=3
+```
 
-Describe a Pod (Detailed Info)
+## 🔹 Describe a Pod (Detailed Info)
+
+```bash
 kubectl describe pod etcd-minikube -n kube-system
+```
 
-Enter Inside a Pod
+## 🔹 Enter Inside a Pod
 
 First check pod name:
 
+```bash
 kubectl get pods
-
+```
 
 Then:
 
+```bash
 kubectl exec -it <pod-name> -- /bin/bash
+```
 
-
-You are now inside the container.
-From here, you cannot use kubectl.
+You are now inside the container.  
+You cannot use `kubectl` inside the container unless it is installed there.
 
 Exit:
 
+```bash
 exit
+```
 
-Delete Deployment
+## 🔹 Delete Deployment
+
+```bash
 kubectl delete deployment khushbunginx
+```
 
-📄 YAML (Declarative Way)
+---
 
-Instead of commands, we use YAML files.
+# 📄 YAML (Declarative Approach)
 
-Example: khushbunginx-deployment.yaml
+Instead of using commands, we can define resources using YAML files.
 
-Apply it:
+Apply a YAML file:
 
+```bash
 kubectl apply -f khushbunginx-deployment.yaml
+```
+
+---
+
+# ⚙️ What Happens Internally?
+
+When you apply a Deployment:
+
+1. `kubectl` sends request to API Server  
+2. API Server stores desired state in **etcd**  
+3. Scheduler selects a node  
+4. Kubelet creates the Pod  
+5. Container runtime pulls the image  
+6. Container starts running  
+
+---
+
+# 🎯 Summary
+
+- **Docker** → Builds and runs containers  
+- **Kubernetes** → Manages containers at scale  
+- **Minikube** → Local Kubernetes cluster for learning  
+- **kubectl** → Tool to control Kubernetes  
