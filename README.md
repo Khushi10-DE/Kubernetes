@@ -13,7 +13,7 @@ Docker is a platform that:
   - Dependencies
   - System tools  
 
-Kubernetes uses a **container runtime** (like Docker or containerd) to run containers.
+Kubernetes uses a **container runtime** (like Docker or containers) to run containers.
 
 ---
 
